@@ -1,4 +1,11 @@
-# Xbox-Stats-Bot
+![Xbox](https://img.shields.io/badge/xbox-%23107C10.svg?style=for-the-badge&logo=xbox&logoColor=white)
+![Xbox](https://img.shields.io/badge/stats-%23107C10.svg?style=for-the-badge&logo=xbox&logoColor=white)
+![Xbox](https://img.shields.io/badge/bot-%23107C10.svg?style=for-the-badge&logo=xbox&logoColor=white)
+### Xbox-Stats-Bot
+
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logoColor=ffdd54)
+
+Build with https://xbl.io/
 
 ## Fast Start
 1. Создайте файл config.py
