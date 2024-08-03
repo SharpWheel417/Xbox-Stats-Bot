@@ -35,13 +35,12 @@ class Achievements:
     self.currentGamerscore = currentGamerscore
     self.totalGamerscore = totalGamerscore
     self.lastTimePlayed = lastTimePlayed
-    
+
 class Media:
-  def __init__(self, type, url):
+  def __init__(self, type, screen_url, video_url):
     self.type = type
-    self.url = url
-
-
+    self.screen_url = screen_url
+    self.video_url = video_url
 
 def get_acc():
     response = requests.get(ACCOUNT, headers=headers)
@@ -99,8 +98,8 @@ def get_achivments(game_id, xapi) -> list[Achievement]:
       achivments.append(achivment)
 
     return achivments
-  
-  
+
+
 def get_sceenshots(xapi) -> list[Media]:
   headers = {
   'accept': '*/*',
@@ -119,12 +118,12 @@ def get_sceenshots(xapi) -> list[Media]:
       else:
         i+=1
         if 'clipId' in activity_item:
-            media = Media('video', activity_item["downloadUri"])
+            media = Media('video', activity_item["clipThumbnail"], activity_item["downloadUri"])
             medias.append(media)
         elif 'screenshotId' in activity_item:
-            media = Media('photo', activity_item["screenshotUri"])
+            media = Media('photo', activity_item["screenshotUri"], "")
             medias.append(media)
         else:
           continue
 
-  return medias
+    return medias

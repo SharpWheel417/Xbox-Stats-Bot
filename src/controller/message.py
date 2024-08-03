@@ -53,14 +53,14 @@ async def handle_message(update: Update, context: CallbackContext):
             u.stage = 'change_games'
             u.set_stage()
             await sendmess_buttons("Выбериет игру", buttons.game_page(games), update, context)
-            
+
         if text == 'Медиа':
             media = xbox.get_sceenshots(u.xapi)
             for m in media:
                 if m.type == 'video':
-                    await sendmess(f"{m.url}", update, context)
+                    await send_pic(m.screen_url, f'{m.video_url}',  update, context)
                 elif m.type == 'photo':
-                    await send_pic(m.url, "", update, context)
+                    await send_pic(m.screen_url, "", update, context)
 
     if u.stage == 'change_games':
         game = Game(u.get_id()[0], text, '')
