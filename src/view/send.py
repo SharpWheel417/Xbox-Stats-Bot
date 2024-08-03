@@ -5,7 +5,7 @@ import requests
 import telegram
 
 async def sendmess(text: any, update: Update, context: ContextTypes):
-  await context.bot.send_message(chat_id=update.effective_chat.id, text=str(text), parse_mode='Markdown')
+  await context.bot.send_message(chat_id=update.effective_chat.id, text=str(text))
 
 
 async def sendmess_buttons(text: any, reply_markup: any, update: Update, context: ContextTypes):
@@ -14,6 +14,9 @@ async def sendmess_buttons(text: any, reply_markup: any, update: Update, context
 
 async def send_pic(f: any, text: any, update: Update, context: ContextTypes):
   await context.bot.send_photo(chat_id=update.effective_chat.id, photo=f, caption=str(text))
+
+async def send_video(f: str, text: str, update: Update, context: ContextTypes):
+    await context.bot.send_video(chat_id=update.effective_chat.id, video=f, caption=text)
 
 def sendmess_user_id(txt, chat_id):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage?chat_id={chat_id}&text={txt}"

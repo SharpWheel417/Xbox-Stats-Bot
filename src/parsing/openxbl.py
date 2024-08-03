@@ -9,8 +9,7 @@ BASE_URL = 'https://xbl.io/'
 ACCOUNT = BASE_URL + '/api/v2/account'
 ACHIEVMENTS = BASE_URL + '/api/v2/achievements'
 ACHIEVMENTS_TITLE = BASE_URL + '/api/v2/achievements/title/'
-
-import requests
+SCREENSHOT = BASE_URL + '/api/v2/activity/history'
 
 headers = {
   'accept': '*/*',
@@ -36,6 +35,11 @@ class Achievements:
     self.currentGamerscore = currentGamerscore
     self.totalGamerscore = totalGamerscore
     self.lastTimePlayed = lastTimePlayed
+    
+class Media:
+  def __init__(self, type, url):
+    self.type = type
+    self.url = url
 
 
 
@@ -95,3 +99,32 @@ def get_achivments(game_id, xapi) -> list[Achievement]:
       achivments.append(achivment)
 
     return achivments
+  
+  
+def get_sceenshots(xapi) -> list[Media]:
+  headers = {
+  'accept': '*/*',
+  'accept-language': 'ru',
+  'x-authorization': f'{xapi}'
+}
+
+  response = requests.get(SCREENSHOT, headers=headers)
+  if response.status_code == 200:
+    data = response.json()
+    medias = []
+    i=0
+    for activity_item in data['activityItems']:
+      if i > 5:
+        break
+      else:
+        i+=1
+        if 'clipId' in activity_item:
+            media = Media('video', activity_item["downloadUri"])
+            medias.append(media)
+        elif 'screenshotId' in activity_item:
+            media = Media('photo', activity_item["screenshotUri"])
+            medias.append(media)
+        else:
+          continue
+
+  return medias
