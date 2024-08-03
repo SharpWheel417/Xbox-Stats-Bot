@@ -1,7 +1,7 @@
 import subprocess
 import os
 from telegram import Game, Update, Bot
-from telegram.ext import CallbackContext
+from telegram.ext import CallbackContext, ContextTypes
 import subprocess
 
 from config import ADMIN_ID
@@ -62,6 +62,31 @@ async def handle_message(update: Update, context: CallbackContext):
                 elif m.type == 'photo':
                     await send_pic(m.screen_url, "", update, context)
 
+        if text == 'Список ачивок':
+            games = Game(u.get_id()[0], '', '').get_all()
+            u.stage = 'change_games_achivments_list'
+            u.set_stage()
+            await sendmess_buttons("Выберете игру", buttons.game_page(games), update, context)
+
+    if u.stage == 'change_games_achivments_list':
+        game = Game(u.get_id()[0], text, '')
+        game_id = game.get_game_id()
+        achivments = xbox.get_achivments(game_id, u.xapi)
+        u.stage='home'
+        u.set_stage()
+        i=0
+        messages = []
+        for achivment in achivments:
+            if achivment.progressState == 'Achieved':
+                messages.append(f'✅{achivment.name}')
+            else:
+                messages.append(f'❌{achivment.name}')
+        if messages:
+            split_message_send(message=messages, update=update, context=context)
+
+
+
+
     if u.stage == 'change_games':
         game = Game(u.get_id()[0], text, '')
         game_id = game.get_game_id()
@@ -78,8 +103,6 @@ async def handle_message(update: Update, context: CallbackContext):
                 # Display the achievement with image
                 await send_pic(f=achivment.iconURL, text=f'{achivment.name}\n{achivment.description}\nСекретное: {achivment.isSecret}\nПрогресс: {achivment.progressState}\nG:{achivment.value}', update=update, context=context)
             i+=1
-
-
         if messages:
             # Split the messages into chunks of 2000 characters
             message_chunks = [messages[i:i+255] for i in range(0, len(messages), 255)]
@@ -118,3 +141,12 @@ async def handle_message(update: Update, context: CallbackContext):
     #     output = os.popen(text).read()
     #     await sendmess(f'```bash\n{output}```', update, context)
     # await sendmess(f'```bash\nxs```', update, context)
+
+
+
+
+async def split_message_send(messages, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Split the messages into chunks of 2000 characters
+    message_chunks = [messages[i:i+255] for i in range(0, len(messages), 255)]
+    for i, chunk in enumerate(message_chunks):
+        await sendmess('\n'.join(chunk), update=update, context=context)
