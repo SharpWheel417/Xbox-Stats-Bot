@@ -2,7 +2,7 @@ from telegram import ReplyKeyboardMarkup
 
 from src.model.games import Game
 
-user_base = ReplyKeyboardMarkup([['Ачивки', 'Аккаунт'], ['Ввести ключ OpenXBL', 'Обновить игры', 'Аккаунт', 'Games'], ['Помощь']], resize_keyboard=True)
+user_base = ReplyKeyboardMarkup([['Ачивки', 'Медиа', 'Аккаунт'], ['Ввести ключ OpenXBL', 'Обновить игры', 'Аккаунт', 'Games'], ['Помощь']], resize_keyboard=True)
 
 def game_page(games: Game):
     mass_buttons = []
