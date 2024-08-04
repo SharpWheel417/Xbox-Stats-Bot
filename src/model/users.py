@@ -1,18 +1,19 @@
 from src.model import db
 
 class User:
-  def __init__(self, name, chat_id, stage, xapi):
+  def __init__(self, name, chat_id, stage, xapi, pick_game):
     self.name = name
     self.chat_id = chat_id
     self.stage = stage
     self.xapi = xapi
+    self.pick_game = pick_game
 
   def add(self):
     ### Проверка на существование юзера
     db.cursor.execute(f'SELECT * FROM users WHERE chat_id={self.chat_id}')
     u = db.cursor.fetchone()
     if u is None:
-      db.cursor.execute(f'INSERT INTO users (name, chat_id, stage, xapi) VALUES ("{self.name}", {self.chat_id}, "{self.stage}", "{self.xapi}")')
+      db.cursor.execute(f'INSERT INTO users (name, chat_id, stage, xapi, pick_game) VALUES ("{self.name}", {self.chat_id}, "{self.stage}", "{self.xapi}", "")')
       # Commit the changes to the database
       db.conn.commit()
     else:
@@ -26,7 +27,7 @@ class User:
     cursor.execute(f'SELECT * FROM users WHERE chat_id={self.chat_id}')
     u = cursor.fetchone()
     if u is not None:
-        user = User(u[1], u[2], u[3], u[4])
+        user = User(u[1], u[2], u[3], u[4], u[5])
     else:
         user = None
     # Close the cursor and the connection to the database
@@ -60,13 +61,8 @@ class User:
     cursor = db.conn.cursor()
 
     # Check if the user exists
-    cursor.execute(f'SELECT * FROM users WHERE chat_id={self.chat_id}')
-    u = cursor.fetchone()
-    if u is None:
-        # If the user doesn't exist, insert a new record
-        db.cursor.execute(f'INSERT INTO users (name, chat_id, stage) VALUES ("{self.name}", {self.chat_id}, ?)', (self.stage,))
-    else:
-        db.cursor.execute(f'UPDATE users SET stage = ? WHERE chat_id = ?', (self.stage, self.chat_id))
+    if check_user_exist(self):
+      db.cursor.execute(f'UPDATE users SET stage = ? WHERE chat_id = ?', (self.stage, self.chat_id))
 
     db.conn.commit()
 
@@ -77,6 +73,26 @@ class User:
     db.conn.commit()
 
 
+  def get_pick_game(self):
+    cursor = db.conn.cursor()
+    cursor.execute(f'SELECT * FROM users WHERE chat_id={self.chat_id}')
+    u = cursor.fetchone()
+    if u is not None:
+        user = User(u[1], u[2], u[3], u[4])
+    else:
+        user = None
+    # Close the cursor and the connection to the database
+    cursor.close()
+    return user.pick_game
+
+
+  def set_pick_game(self):
+    # Create a cursor object to perform database operations
+    cursor = db.conn.cursor()
+    if check_user_exist(self):
+      db.cursor.execute(f'UPDATE users SET pick_game = ? WHERE chat_id = ?', (self.pick_game, self.chat_id))
+
+    db.conn.commit()
 
 
 def get_all():
@@ -89,3 +105,17 @@ def get_all():
     # Close the cursor and the connection to the database
     cursor.close()
     return users
+
+
+def check_user_exist(u: User):
+  cursor = db.conn.cursor()
+  cursor.execute(f'SELECT * FROM users WHERE chat_id={u.chat_id}')
+  user = cursor.fetchone()
+  if user is not None:
+    cursor.close()
+    return True
+  else:
+    db.cursor.execute(f'INSERT INTO users (name, chat_id, stage, pick_game) VALUES ("{u.name}", {u.chat_id}, ?, "{u.pick_game}")', (u.stage,))
+    db.conn.commit()
+    cursor.close()
+    return False
