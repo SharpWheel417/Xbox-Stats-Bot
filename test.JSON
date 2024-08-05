@@ -1,0 +1,27 @@
+{
+  "groups": [
+    {
+      "name": "Hero",
+      "titleid": "2014590773",
+      "statlistscollection": []
+    }
+  ],
+  "statlistscollection": [
+    {
+      "arrangebyfield": "xuid",
+      "arrangebyfieldid": "2535408262510449",
+      "stats": [
+        {
+          "groupproperties": {},
+          "xuid": "2535408262510449",
+          "scid": "00000000-0000-0000-0000-000078143735",
+          "titleid": "2014590773",
+          "name": "MinutesPlayed",
+          "type": "Integer",
+          "value": "664",
+          "properties": {}
+        }
+      ]
+    }
+  ]
+}
