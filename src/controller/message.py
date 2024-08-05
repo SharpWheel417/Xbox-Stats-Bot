@@ -29,17 +29,18 @@ async def handle_message(update: Update, context: CallbackContext):
         u.stage = 'home'
         u.set_xapi()
         u.set_stage()
-        await sendmess('Ключ установлен', update, context)
+        await sendmess('API key installed', update, context)
         return
 
     if u.stage == 'home':
-        if text == 'Ввести ключ OpenXBL':
+
+        if text == 'Send API key':
             u.stage = 'get_xapi'
             u.set_stage()
-            await sendmess('Введи ключ', update, context)
+            await sendmess('Paste API key and send', update, context)
             return
 
-        if text == 'Обновить игры':
+        if text == 'Update games':
             xbox.update_games(u.get_id(), u.xapi)
             games = Game(u.get_id()[0], '', '').get_all()
             txt=''
@@ -48,14 +49,14 @@ async def handle_message(update: Update, context: CallbackContext):
 
             await sendmess(txt, update, context)
 
-        if text == 'Ачивки':
+        if text == 'Achivment':
             games = Game(u.get_id()[0], '', '').get_all()
             u.stage = 'change_games_achivments'
             u.set_stage()
-            await sendmess_buttons("Выбериет игру", buttons.game_page(games), update, context)
+            await sendmess_buttons("Change game", buttons.game_page(games), update, context)
             return
 
-        if text == 'Медиа':
+        if text == 'Media':
             media = xbox.get_sceenshots(u.xapi)
             for m in media:
                 if m.type == 'video':
@@ -63,18 +64,18 @@ async def handle_message(update: Update, context: CallbackContext):
                 elif m.type == 'photo':
                     await send_pic(m.screen_url, "", update, context)
 
-        if text == 'Список ачивок':
+        if text == 'Achivment list':
             games = Game(u.get_id()[0], '', '').get_all()
             u.stage = 'change_games_achivments_list'
             u.set_stage()
-            await sendmess_buttons("Выберете игру", buttons.game_page(games), update, context)
+            await sendmess_buttons("Change game", buttons.game_page(games), update, context)
             return
 
-        if text == 'Время':
+        if text == 'Time':
             games = Game(u.get_id()[0], '', '').get_all()
             u.stage = 'change_games_time'
             u.set_stage()
-            await sendmess_buttons("Выберете игру", buttons.game_page(games), update, context)
+            await sendmess_buttons("Change game", buttons.game_page(games), update, context)
             return
 
     if u.stage == 'change_games_time':
@@ -110,7 +111,7 @@ async def handle_message(update: Update, context: CallbackContext):
         u.set_stage()
         u.pick_game = text
         u.set_pick_game()
-        await sendmess_buttons("Выберете сортировку", buttons.achivment_sort, update, context)
+        await sendmess_buttons("Change sort", buttons.achivment_sort, update, context)
         return
 
     ## ВЫБОР СОРТИРОВКИ АЧИВОК
@@ -136,10 +137,10 @@ async def handle_message(update: Update, context: CallbackContext):
                 continue
             if i > 5:
                 # Append the achievement text to the messages list
-                messages.append(f'{achivment.name}\n{achivment.description}\nСекретное: {achivment.isSecret}\nПрогресс: {achivment.progressState}\nG:{achivment.value}')
+                messages.append(f'{achivment.name}\n{achivment.description}\isSecret: {achivment.isSecret}\progressState: {achivment.progressState}\nG:{achivment.value}')
             else:
                 # Display the achievement with image
-                await send_pic(f=achivment.iconURL, text=f'{achivment.name}\n{achivment.description}\nСекретное: {achivment.isSecret}\nПрогресс: {achivment.progressState}\nG:{achivment.value}', update=update, context=context)
+                await send_pic(f=achivment.iconURL, text=f'{achivment.name}\n{achivment.description}\isSecret: {achivment.isSecret}\progressState: {achivment.progressState}\nG:{achivment.value}', update=update, context=context)
             i+=1
         if messages:
             # Split the messages into chunks of 2000 characters
@@ -156,7 +157,7 @@ async def handle_message(update: Update, context: CallbackContext):
 
 
 
-    if text == 'Аккаунт':
+    if text == 'Account':
         account = xbox.get_acc()
         await send_pic(account.GemrIconUrl, f'Tag: {account.GamerTag}\nScore: {account.GamerScore}', update, context)
 
@@ -172,10 +173,10 @@ async def switch_send_ach(type, achivments, update: Update, context: ContextType
     i=0
     messages = []
     for achivment in achivments:
-            if type == 'Невыполненные':
+            if type == 'Unfulfilled':
                 if achivment.progressState == 'Achieved':
                     continue
-            if type == 'Начатые':
+            if type == 'Started':
                 if achivment.progressState == 'NotStarted' or achivment.progressState == 'Achieved':
                     continue
             if i > 5:
@@ -187,7 +188,7 @@ async def switch_send_ach(type, achivments, update: Update, context: ContextType
 
 
     if messages:
-            message_chunks = [messages[i:i+255] for i in range(0, len(messages), 255)]
+            message_chunks = [messages[i:i+220] for i in range(0, len(messages), 220)]
 
             for i, chunk in enumerate(message_chunks):
                 await sendmess('\n'.join(chunk), update=update, context=context, reply_markup=buttons.user_base)

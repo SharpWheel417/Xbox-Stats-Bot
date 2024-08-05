@@ -84,7 +84,6 @@ def update_games(user_id, xapi):
 def get_achivments(game_id, xapi) -> list[Achievement]:
   headers = {
   'accept': '*/*',
-  'accept-language': 'ru',
   'x-authorization': f'{xapi}'
 }
 
@@ -104,7 +103,6 @@ def get_achivments(game_id, xapi) -> list[Achievement]:
 def get_sceenshots(xapi) -> list[Media]:
   headers = {
   'accept': '*/*',
-  'accept-language': 'ru',
   'x-authorization': f'{xapi}'
 }
 
@@ -133,7 +131,6 @@ def get_sceenshots(xapi) -> list[Media]:
 def get_minuted_playes(xapi, game_id) -> list[Media]:
   headers = {
   'accept': '*/*',
-  'accept-language': 'ru',
   'x-authorization': f'{xapi}'
 }
 
@@ -143,13 +140,13 @@ def get_minuted_playes(xapi, game_id) -> list[Media]:
     minutes = int(data['statlistscollection'][0]['stats'][0]['value'])
 
     if minutes < 60:
-        print(f"{minutes} минут")
+        print(f"{minutes} minutes")
     elif minutes < 24 * 60:
         hours = minutes // 60
         minutes %= 60
-        return f"{hours} часов {minutes} минут"
+        return f"{hours} hours {minutes} minutes"
     else:
         days = minutes // (24 * 60)
         hours = (minutes % (24 * 60)) // 60
         minutes %= 60
-        return f"{days} дней {hours} часов {minutes} минут"
+        return f"{days} days {hours} hours {minutes} minutes"
