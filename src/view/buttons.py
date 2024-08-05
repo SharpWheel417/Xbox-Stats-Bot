@@ -2,7 +2,7 @@ from telegram import ReplyKeyboardMarkup
 
 from src.model.games import Game
 
-user_base = ReplyKeyboardMarkup([['Медиа', 'Аккаунт'], ['Ачивки', 'Список ачивок'], ['Ввести ключ OpenXBL', 'Обновить игры', 'Аккаунт', 'Games'], ['Помощь']], resize_keyboard=True)
+user_base = ReplyKeyboardMarkup([['Медиа', 'Аккаунт'], ['Ачивки', 'Список ачивок', 'Время'], ['Ввести ключ OpenXBL', 'Обновить игры', 'Аккаунт', 'Games'], ['Помощь']], resize_keyboard=True)
 
 achivment_sort = ReplyKeyboardMarkup([['Все', 'Невыполненные'], ['Начатые']], resize_keyboard=True)
 

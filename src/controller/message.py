@@ -6,7 +6,7 @@ import subprocess
 
 from config import ADMIN_ID
 from src.model.users import User
-from ..view.send import send_pic, sendmess, sendmess_buttons, send_video
+from ..view.send import send_pic, sendmess, sendmess_buttons
 
 from ..parsing import openxbl as xbox
 from src.model.games import Game
@@ -68,7 +68,25 @@ async def handle_message(update: Update, context: CallbackContext):
             u.stage = 'change_games_achivments_list'
             u.set_stage()
             await sendmess_buttons("Выберете игру", buttons.game_page(games), update, context)
+            return
 
+        if text == 'Время':
+            games = Game(u.get_id()[0], '', '').get_all()
+            u.stage = 'change_games_time'
+            u.set_stage()
+            await sendmess_buttons("Выберете игру", buttons.game_page(games), update, context)
+            return
+
+    if u.stage == 'change_games_time':
+        game = Game(u.get_id()[0], text, '')
+        game_id = game.get_game_id()
+        time = xbox.get_minuted_playes(u.xapi, game_id)
+        u.stage='home'
+        u.set_stage()
+        await sendmess(str(time), update, context, reply_markup=buttons.user_base)
+        return
+
+    ## СПИСОК АЧИВОК
     if u.stage == 'change_games_achivments_list':
         game = Game(u.get_id()[0], text, '')
         game_id = game.get_game_id()
@@ -83,9 +101,10 @@ async def handle_message(update: Update, context: CallbackContext):
             else:
                 messages.append(f'❌{achivment.name}')
         if messages:
-            split_message_send(message=messages, update=update, context=context)
+            await split_message_send(messages=messages, update=update, context=context)
 
 
+    ## ВЫБОР ИГРЫ ДЛЯ АЧИВОК
     if u.stage == 'change_games_achivments':
         u.stage = 'change_sort_achivments'
         u.set_stage()
@@ -94,6 +113,7 @@ async def handle_message(update: Update, context: CallbackContext):
         await sendmess_buttons("Выберете сортировку", buttons.achivment_sort, update, context)
         return
 
+    ## ВЫБОР СОРТИРОВКИ АЧИВОК
     if u.stage == 'change_sort_achivments':
         game = Game(u.get_id()[0], u.pick_game, '')
         game_id = game.get_game_id()
@@ -104,7 +124,7 @@ async def handle_message(update: Update, context: CallbackContext):
 
 
 
-
+    ## ВЫБОР ИГРЫ
     if u.stage == 'change_games':
         game = Game(u.get_id()[0], text, '')
         game_id = game.get_game_id()
@@ -140,28 +160,14 @@ async def handle_message(update: Update, context: CallbackContext):
         account = xbox.get_acc()
         await send_pic(account.GemrIconUrl, f'Tag: {account.GamerTag}\nScore: {account.GamerScore}', update, context)
 
-    if text == 'Achievements':
-        account = xbox.get_acc()
-        await send_pic(account.GemrIconUrl, f'Tag: {account.GamerTag}\nScore: {account.GamerScore}', update, context)
-
-    if text == 'Games':
-        user = User(update.effective_user.name, update.effective_user.id, 'games')
 
 
-
-
-# TODO
-    # global terminal
-    # if context._user_id in ADMIN_ID:
-
-    #     print(text)
-
-    #     output = os.popen(text).read()
-    #     await sendmess(f'```bash\n{output}```', update, context)
-    # await sendmess(f'```bash\nxs```', update, context)
 
 
 async def switch_send_ach(type, achivments, update: Update, context: ContextTypes):
+    '''
+        Сортирует и выводит ачивки
+    '''
 
     i=0
     messages = []
@@ -173,25 +179,26 @@ async def switch_send_ach(type, achivments, update: Update, context: ContextType
                 if achivment.progressState == 'NotStarted' or achivment.progressState == 'Achieved':
                     continue
             if i > 5:
-                # Append the achievement text to the messages list
                 messages.append(f'{achivment.name}\n{achivment.description}\nСекретное: {achivment.isSecret}\nПрогресс: {achivment.progressState}\nG:{achivment.value}')
             else:
-                # Display the achievement with image
+
                 await send_pic(f=achivment.iconURL, text=f'{achivment.name}\n{achivment.description}\nСекретное: {achivment.isSecret}\nПрогресс: {achivment.progressState}\nG:{achivment.value}', update=update, context=context)
             i+=1
 
 
     if messages:
-            # Split the messages into chunks of 2000 characters
             message_chunks = [messages[i:i+255] for i in range(0, len(messages), 255)]
 
-            # Send each chunk as a separate message
             for i, chunk in enumerate(message_chunks):
-                await sendmess('\n'.join(chunk), update=update, context=context)
+                await sendmess('\n'.join(chunk), update=update, context=context, reply_markup=buttons.user_base)
+
 
 
 async def split_message_send(messages, update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Split the messages into chunks of 2000 characters
+    '''
+        Разбивает массивное сообщение и отправляет польщователю
+    '''
+    # Split the messages into chunks of 255 characters
     message_chunks = [messages[i:i+255] for i in range(0, len(messages), 255)]
     for i, chunk in enumerate(message_chunks):
-        await sendmess('\n'.join(chunk), update=update, context=context)
+        await sendmess('\n'.join(chunk), update=update, context=context, reply_markup=buttons.user_base)

@@ -10,6 +10,7 @@ ACCOUNT = BASE_URL + '/api/v2/account'
 ACHIEVMENTS = BASE_URL + '/api/v2/achievements'
 ACHIEVMENTS_TITLE = BASE_URL + '/api/v2/achievements/title/'
 SCREENSHOT = BASE_URL + '/api/v2/activity/history'
+PLAYED_MINUTES = BASE_URL + '/api/v2/achievements/stats/'
 
 headers = {
   'accept': '*/*',
@@ -127,3 +128,28 @@ def get_sceenshots(xapi) -> list[Media]:
           continue
 
     return medias
+
+
+def get_minuted_playes(xapi, game_id) -> list[Media]:
+  headers = {
+  'accept': '*/*',
+  'accept-language': 'ru',
+  'x-authorization': f'{xapi}'
+}
+
+  response = requests.get(PLAYED_MINUTES+game_id, headers=headers)
+  if response.status_code == 200:
+    data = response.json()
+    minutes = int(data['statlistscollection'][0]['stats'][0]['value'])
+
+    if minutes < 60:
+        print(f"{minutes} минут")
+    elif minutes < 24 * 60:
+        hours = minutes // 60
+        minutes %= 60
+        return f"{hours} часов {minutes} минут"
+    else:
+        days = minutes // (24 * 60)
+        hours = (minutes % (24 * 60)) // 60
+        minutes %= 60
+        return f"{days} дней {hours} часов {minutes} минут"
