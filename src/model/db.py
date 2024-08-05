@@ -13,7 +13,8 @@ cursor.execute('''
         name TEXT,
         chat_id TEXT,
         stage TEXT,
-        xapi TEXT
+        xapi TEXT,
+        pick_game TEXT
     )
 
 ''')

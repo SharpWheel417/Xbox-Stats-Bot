@@ -28,5 +28,8 @@ class Game:
     return games
 
   def get_game_id(self):
-    db.cursor.execute(f'SELECT game_id FROM games WHERE name = "{self.name}"')
-    return db.cursor.fetchone()[0]
+    cursor = db.conn.cursor()
+    cursor.execute(f'SELECT game_id FROM games WHERE name = "{self.name}"')
+    id = cursor.fetchone()[0]
+    cursor.close()
+    return id

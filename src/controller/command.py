@@ -10,7 +10,7 @@ import config as config
 ### Комманда Старт ###
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-  u = users.User(update.effective_user.full_name, update.effective_chat.id, 'home', '')
+  u = users.User(update.effective_user.full_name, update.effective_chat.id, 'home', '', '')
 
   u.add()
 
